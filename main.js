@@ -29,22 +29,56 @@ class Field {
     return tempField;
   }
 
+  getFieldElement() {
+    return this.field[this.hPos][this.vPos];
+  }
+
+  setFieldElement(char) {
+    this.field[this.hPos][this.vPos] = char;
+  }
+
   print() {
     for(const fieldRow of this.field) {
       console.log(fieldRow.join(' '));
     }
   }
 
+  printPosition() {
+    console.log(`Player position: (${this.hPos}, ${this.vPos})`)
+  }
+
   updatePosition(dir) {
-    if(dir === 'l') {
-      this.hPos -= 1;
-    } else if(dir ==='r') {
-      this.hPos += 1;
-    } else if(dir === 'd') {
-      this.vPos -= 1;
-    } else if(dir === 'u') {
-      this.vPos += 1;
-    } else return 'Invalid direction';
+    if(this.isValidPosition()) {
+      this.setFieldElement(fieldChar);
+      if(dir === 'u') {
+        this.hPos -= 1;
+      } else if(dir ==='d') {
+        this.hPos += 1;
+      } else if(dir === 'l') {
+        this.vPos -= 1;
+      } else if(dir === 'r') {
+        this.vPos += 1;
+      } else {
+          console.log('invalid direction');
+          return 'Invalid direction';
+      }
+      if(this.isValidPosition()) {
+        this.setFieldElement(pathChar);
+      } else return;
+        
+    } else {
+        return;
+    }
+    
+  }
+
+  isValidPosition() {
+    try {
+      return (this.getFieldElement() === pathChar || this.getFieldElement() === fieldChar);
+    } catch(e) {
+      return false;
+    }
+
   }
 
 }
@@ -55,21 +89,24 @@ function checkWin(fieldElement) {
   } else if(fieldElement === 'O') {
     return 'Sorry, you fell down a hole';
   } else if(fieldElement === '░') {
-    return;
+    return '';
   }
 }
 
-function askUser() {
-  process.stdin.on('data', function(input) {
-    //input should be a direction
-    console.log()
-  })
+function askUser(gameField) {
+  while(gameField.isValidPosition()) { 
+    gameField.printPosition();
+    const userInput = prompt('Which way?');
+    gameField.updatePosition(userInput.trim().toLowerCase());
+    gameField.print();
+  }
+  console.log(checkWin(gameField.getFieldElement()));
 }
 
 function runGameLoop() {
   //initialize field
   const gameField = new Field(Field.generateField(5,10, 0.25));
   gameField.print();
-
+  askUser(gameField); 
 }
 runGameLoop();
