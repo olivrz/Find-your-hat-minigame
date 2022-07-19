@@ -26,6 +26,12 @@ class Field {
       }
     }
     tempField[0][0] = pathChar;
+
+    //add hat
+    const xHat = Math.floor(Math.random() * h); 
+    const yHat = Math.floor(Math.random() * w); 
+    if(yHat === 0 && xHat === 0 ) {yHat = w-1;}
+    tempField[xHat][yHat] = hat;
     return tempField;
   }
 
@@ -41,10 +47,6 @@ class Field {
     for(const fieldRow of this.field) {
       console.log(fieldRow.join(' '));
     }
-  }
-
-  printPosition() {
-    console.log(`Player position: (${this.hPos}, ${this.vPos})`)
   }
 
   updatePosition(dir) {
@@ -74,8 +76,11 @@ class Field {
 
   isValidPosition() {
     try {
+      if(this.getFieldElement() === undefined)  { 
+        return false;}
       return (this.getFieldElement() === pathChar || this.getFieldElement() === fieldChar);
     } catch(e) {
+      console.log('Out of bounds')
       return false;
     }
 
@@ -90,12 +95,13 @@ function checkWin(fieldElement) {
     return 'Sorry, you fell down a hole';
   } else if(fieldElement === '░') {
     return '';
+  } else if(fieldElement === undefined) {
+    return 'Out of bounds';
   }
 }
 
 function askUser(gameField) {
   while(gameField.isValidPosition()) { 
-    gameField.printPosition();
     const userInput = prompt('Which way?');
     gameField.updatePosition(userInput.trim().toLowerCase());
     gameField.print();
